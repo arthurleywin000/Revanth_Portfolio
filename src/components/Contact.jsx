@@ -86,7 +86,7 @@ const Contact = () => {
                   { label: 'Email', value: 'revanth.palukuri2006@gmail.com', href: 'mailto:revanth.palukuri2006@gmail.com' },
                   { label: 'Phone', value: '+91 8431463895', href: 'tel:+918431463895' },
                   { label: 'GitHub', value: 'arthurleywin000', href: 'https://github.com/arthurleywin000', external: true },
-                  { label: 'LinkedIn', value: 'revanth-palukuri', href: 'https://linkedin.com/in/revanth-palukuri', external: true },
+                  { label: 'LinkedIn', value: 'revanth-palukuri', href: 'https://www.linkedin.com/in/revanth-palukuri-997822293', external: true },
                 ].map((item) => (
                   <p key={item.label} style={{ color: textSec, margin: 0, fontSize: '0.9rem' }}>
                     <span style={{ color: textPrimary, fontWeight: 600 }}>{item.label}: </span>

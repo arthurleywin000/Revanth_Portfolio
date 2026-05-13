@@ -46,7 +46,7 @@ const Footer = () => {
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem' }}>
             {[
               { label: 'GitHub', href: 'https://github.com/arthurleywin000', external: true },
-              { label: 'LinkedIn', href: 'https://linkedin.com/in/revanth-palukuri', external: true },
+              { label: 'LinkedIn', href: 'https://www.linkedin.com/in/revanth-palukuri-997822293', external: true },
               { label: 'Email', href: 'mailto:revanth.palukuri2006@gmail.com' },
             ].map((link) => (
               <a
