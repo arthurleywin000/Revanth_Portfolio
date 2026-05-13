@@ -13,6 +13,21 @@ const Contact = () => {
   const inputBg     = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.8)';
   const inputBorder = isDark ? 'rgba(99,179,237,0.2)' : 'rgba(15,23,42,0.15)';
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(formData.entries());
+
+    await fetch('/api/send-contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    e.currentTarget.reset();
+  };
+
   return (
     <section id="contact" style={{ backgroundColor: bg, padding: '8rem 0' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 1.5rem' }}>
@@ -80,7 +95,7 @@ const Contact = () => {
             </div>
 
             {/* Right — form */}
-            <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {[
                 { id: 'name', label: 'Name', type: 'text', placeholder: 'Your name' },
                 { id: 'email', label: 'Email', type: 'email', placeholder: 'Your email' },
