@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
+import { useState, useRef } from 'react';
 
 const Contact = () => {
   const { isDark } = useTheme();
+  const formRef = useRef(null);
+  const [status, setStatus] = useState('idle'); // idle | sending | success | error
 
   const bg          = isDark ? '#020b18' : '#ffffff';
   const cardBg      = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(248,250,252,0.9)';
@@ -15,17 +18,29 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatus('sending');
 
     const formData = new FormData(e.currentTarget);
     const payload = Object.fromEntries(formData.entries());
 
-    await fetch('/api/send-contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch('/api/send-contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    e.currentTarget.reset();
+      if (!res.ok) throw new Error('Request failed');
+
+      // ✅ clear the form
+      formRef.current?.reset();
+      setStatus('success');
+    } catch (err) {
+      setStatus('error');
+    } finally {
+      // reset status message after 2s (optional)
+      setTimeout(() => setStatus('idle'), 2000);
+    }
   };
 
   return (
@@ -79,11 +94,7 @@ const Contact = () => {
                       href={item.href}
                       target={item.external ? '_blank' : undefined}
                       rel={item.external ? 'noopener noreferrer' : undefined}
-                      style={{
-                        color: textSec,
-                        textDecoration: 'none',
-                        transition: 'color 0.2s',
-                      }}
+                      style={{ color: textSec, textDecoration: 'none', transition: 'color 0.2s' }}
                       onMouseEnter={e => e.currentTarget.style.color = accent}
                       onMouseLeave={e => e.currentTarget.style.color = textSec}
                     >
@@ -95,7 +106,7 @@ const Contact = () => {
             </div>
 
             {/* Right — form */}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {[
                 { id: 'name', label: 'Name', type: 'text', placeholder: 'Your name' },
                 { id: 'email', label: 'Email', type: 'email', placeholder: 'Your email' },
@@ -155,10 +166,12 @@ const Contact = () => {
                   onBlur={e => e.currentTarget.style.borderColor = inputBorder}
                 />
               </div>
+
               <motion.button
                 type="submit"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                disabled={status === 'sending'}
+                whileHover={{ scale: status === 'sending' ? 1 : 1.02 }}
+                whileTap={{ scale: status === 'sending' ? 1 : 0.98 }}
                 style={{
                   width: '100%',
                   padding: '1rem',
@@ -167,15 +180,25 @@ const Contact = () => {
                   fontWeight: 700,
                   borderRadius: '0.75rem',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: status === 'sending' ? 'not-allowed' : 'pointer',
                   fontSize: '0.95rem',
+                  opacity: status === 'sending' ? 0.7 : 1,
                   transition: 'opacity 0.2s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
               >
-                Send Message
+                {status === 'sending' ? 'Sending...' : 'Send Message'}
               </motion.button>
+
+              {status === 'success' && (
+                <p style={{ color: accent, fontSize: '0.9rem', margin: 0 }}>
+                  Message sent ✅
+                </p>
+              )}
+              {status === 'error' && (
+                <p style={{ color: '#f87171', fontSize: '0.9rem', margin: 0 }}>
+                  Failed to send. Try again.
+                </p>
+              )}
             </form>
           </div>
         </motion.div>
